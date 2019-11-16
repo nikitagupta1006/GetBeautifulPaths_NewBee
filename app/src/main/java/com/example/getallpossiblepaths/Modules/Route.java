@@ -15,6 +15,8 @@ public class Route {
     public String startAddress;
     public LatLng startLocation;
     public List<Integer> aqi;
+    public List<String> htmlInstructions;
+    public List<String> distancesInstructions;
 
     public List<LatLng> points;
 }

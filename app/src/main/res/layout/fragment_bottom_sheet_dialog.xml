@@ -4,11 +4,28 @@
     android:layout_height="match_parent"
     android:paddingBottom="8dp"
     android:paddingTop="8dp"
-    android:id="@+id/linear_layout_fragment_bottom_sheet">
+    android:id="@+id/linear_layout_fragment_bottom_sheet"
+    android:background="@color/quantum_grey50">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@color/blue"
+        android:text="Routes"
+        android:id="@+id/heading"
+        android:gravity="center_horizontal"
+        />
 
     <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/customListView"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/directionListView"
+        android:dividerHeight="0px"
+        android:divider="@color/quantum_grey"
+        />
 
 </LinearLayout>

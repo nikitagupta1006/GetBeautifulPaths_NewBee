@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import android.os.AsyncTask;
 
+import androidx.core.text.HtmlCompat;
+
 import com.android.volley.toolbox.HttpResponse;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.JsonArray;
@@ -121,7 +123,15 @@ public class DirectionFinder {
             for(int j = 0; j < aqiArray.length();++j)
                 list.add(aqiArray.getInt(j));
             route.aqi = list;
-
+            List<String> instructions = new ArrayList<>();
+            JSONArray steps = jsonLeg.getJSONArray("steps");
+            List<String> directionInstructions = new ArrayList<>();
+            for(int j = 0; j < steps.length(); ++j) {
+                String distance = "<strong>" + steps.getJSONObject(j).getJSONObject("distance").getString("text") + "</strong>";
+                instructions.add(HtmlCompat.fromHtml(steps.getJSONObject(j).getString("html_instructions") + " (" + distance + ")",HtmlCompat.FROM_HTML_MODE_LEGACY).toString());
+            }
+            route.htmlInstructions = instructions;
+            route.distancesInstructions = directionInstructions;
             routes.add(route);
         }
 

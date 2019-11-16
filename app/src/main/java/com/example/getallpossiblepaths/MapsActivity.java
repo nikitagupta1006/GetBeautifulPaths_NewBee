@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.util.Property;
 import android.view.LayoutInflater;
@@ -44,8 +45,12 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -60,6 +65,8 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DirectionFinderListener {
 
@@ -143,7 +150,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
-        showBottomSheetDialog();
     }
 
     private void sendRequest() {
@@ -261,6 +267,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             polylinePaths.add(mMap.addPolyline(polylineOptions));
         }
+        showBottomSheetDialogFragment();
+
     }
     public void showBottomSheetDialog() {
         View view = getLayoutInflater().inflate(R.layout.fragment_bottom_sheet_dialog, null);
@@ -271,63 +279,83 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void showBottomSheetDialogFragment() {
-        BottomSheetFragment bottomSheetFragment = new BottomSheetFragment();
+        BottomSheetFragment bottomSheetFragment = new BottomSheetFragment(this.routes);
         bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
 
-    //custom ArrayAdapter
-//    class CustomArrayAdapter extends ArrayAdapter<Route> {
-//
-//        private Context context;
-//        private List<Route> route;
-//
-//        //constructor, call on creation
-//        public CustomArrayAdapter(Context context, int resource, ArrayList<Route> objects) {
-//            super(context, resource, objects);
-//
-//            this.context = context;
-//            this.route = objects;
-//        }
-//
-//        //called when rendering the list
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//
-//            //get the property we are displaying
-//            Property property = rentalProperties.get(position);
-//
-//            //get the inflater and inflate the XML layout for each item
-//            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-//            View view = inflater.inflate(R.layout.property_layout, null);
-//
-//            TextView description = (TextView) view.findViewById(R.id.description);
-//            TextView address = (TextView) view.findViewById(R.id.address);
-//            ImageView image = (ImageView) view.findViewById(R.id.image);
-//
-//            //set address and description
-//            String completeAddress = property.getStreetNumber() + " " + property.getStreetName() + ", " + property.getSuburb() + ", " + property.getState();
-//            address.setText(completeAddress);
-//
-//            //display trimmed excerpt for description
-//            int descriptionLength = property.getDescription().length();
-//            if(descriptionLength >= 100){
-//                String descriptionTrim = property.getDescription().substring(0, 100) + "...";
-//                description.setText(descriptionTrim);
-//            }else{
-//                description.setText(property.getDescription());
-//            }
-//
-//            //set price and rental attributes
-//            price.setText("$" + String.valueOf(property.getPrice()));
-//            bedroom.setText("Bed: " + String.valueOf(property.getBedrooms()));
-//            bathroom.setText("Bath: " + String.valueOf(property.getBathrooms()));
-//            carspot.setText("Car: " + String.valueOf(property.getCarspots()));
-//
-//            //get the image associated with this property
-//            int imageID = context.getResources().getIdentifier(property.getImage(), "drawable", context.getPackageName());
-//            image.setImageResource(imageID);
-//
-//            return view;
-//        }
-//    }
+    static class CustomArrayAdapter extends ArrayAdapter<Route> {
+
+        private Context context;
+        private List<Route> route;
+
+        //constructor, call on creation
+        public CustomArrayAdapter(Context context, int resource, ArrayList<Route> objects) {
+            super(context, resource, objects);
+
+            this.context = context;
+            this.route = objects;
+        }
+
+        //called when rendering the list
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            //get the property we are displaying
+            Route property = route.get(position);
+
+            //get the inflater and inflate the XML layout for each item
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+            View view = inflater.inflate(R.layout.list_view_routes, null);
+            TextView display_time = (TextView) view.findViewById(R.id.display_time);
+            TextView eta = (TextView) view.findViewById(R.id.eta);
+            TextView distance = (TextView) view.findViewById(R.id.distance);
+            CircleImageView aqi_image = (CircleImageView) view.findViewById(R.id.aqi_image);
+
+            float sum = 0;
+            for(int i: property.aqi) {
+                sum = sum + i;
+            }
+            int avg = Math.round(sum / property.aqi.size());
+
+            int color;
+
+            switch(avg){
+                case 0:
+                    color = Color.GREEN;
+                    break;
+                case 1:
+                    color = Color.YELLOW;
+                    break;
+                case 2:
+                    color = getContext().getResources().getColor(R.color.orange);
+                    break;
+                case 3:
+                    color = Color.RED;
+                    break;
+                case 4:
+                    color = getContext().getResources().getColor(R.color.purple);
+                    break;
+                case 5:
+                    color = getContext().getResources().getColor(R.color.maroon);
+                    break;
+                default:
+                    color = Color.GRAY;
+                    break;
+            }
+
+            aqi_image.setCircleBackgroundColor(color);
+
+
+            distance.setText(String.valueOf(property.distance.text));
+            String currentTime = new SimpleDateFormat("HH:mm").format(new Date());
+            Calendar now = Calendar.getInstance();
+
+            now.add(Calendar.SECOND, property.duration.value);
+            String destTime = new SimpleDateFormat("HH:mm").format(now.getTime());
+            eta.setText(String.valueOf(String.format("%.1f", property.duration.value / 60.0) + " min"));
+            display_time.setText(currentTime + " - " + destTime);
+
+            return view;
+        }
+    }
 }
 
