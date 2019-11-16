@@ -6,6 +6,9 @@
     android:paddingTop="8dp"
     android:id="@+id/linear_layout_fragment_bottom_sheet">
 
-
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/customListView"/>
 
 </LinearLayout>

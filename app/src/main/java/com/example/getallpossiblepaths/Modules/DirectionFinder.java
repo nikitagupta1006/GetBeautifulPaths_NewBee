@@ -1,8 +1,13 @@
 package com.example.getallpossiblepaths.Modules;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import android.os.AsyncTask;
 
+import com.android.volley.toolbox.HttpResponse;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.JsonArray;
+import java.net.HttpURLConnection;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +22,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class DirectionFinder {
@@ -50,10 +56,14 @@ public class DirectionFinder {
         protected String doInBackground(String... params) {
             String link = params[0];
             try {
-                URL url = new URL(link);
-                InputStream is = url.openConnection().getInputStream();
+                String link2 = "http://172.16.77.134:8080/getPaths?source_placeId=" + origin + "&dest_placeId=" + destination + "&time=" + new SimpleDateFormat("HH:mm").format(new Date());
+                URL url = new URL(link2);
+                HttpURLConnection httpClient = (HttpURLConnection) url.openConnection();
+                httpClient.setRequestMethod("GET");
                 StringBuffer buffer = new StringBuffer();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                int responseCode = httpClient.getResponseCode();
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(httpClient.getInputStream()));
 
                 String line;
                 while ((line = reader.readLine()) != null) {
@@ -85,8 +95,8 @@ public class DirectionFinder {
             return;
 
         List<Route> routes = new ArrayList<Route>();
-        JSONObject jsonData = new JSONObject(data);
-        JSONArray jsonRoutes = jsonData.getJSONArray("routes");
+        JSONArray jsonData = new JSONArray(data);
+        JSONArray jsonRoutes = jsonData;
         for (int i = 0; i < jsonRoutes.length(); i++) {
             JSONObject jsonRoute = jsonRoutes.getJSONObject(i);
             Route route = new Route();
@@ -106,6 +116,11 @@ public class DirectionFinder {
             route.startLocation = new LatLng(jsonStartLocation.getDouble("lat"), jsonStartLocation.getDouble("lng"));
             route.endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
             route.points = decodePolyLine(overview_polylineJson.getString("points"));
+            List<Integer> list = new ArrayList<>();
+            JSONArray aqiArray = jsonRoute.getJSONArray("AQI_predict");
+            for(int j = 0; j < aqiArray.length();++j)
+                list.add(aqiArray.getInt(j));
+            route.aqi = list;
 
             routes.add(route);
         }

@@ -3,14 +3,23 @@ package com.example.getallpossiblepaths;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Property;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +47,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 
 import com.example.getallpossiblepaths.Modules.DirectionFinder;
@@ -63,10 +73,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ProgressDialog progressDialog;
     private String origin = "";
     private String dest = "";
+    private List<Route> routes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+
         setContentView(R.layout.activity_maps);
         Places.initialize(getApplicationContext(), "AIzaSyC8glAUHZbPM1gzikYcGm-wQIX3PS6MMkU");
         PlacesClient placesClient = Places.createClient(this);
@@ -83,7 +96,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
-               origin = "place_id:" + place.getId();
+               origin = "" + place.getId();
                 Log.i("Fragment", "Place: " + place.getName() + ", " + place.getId());
             }
 
@@ -104,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place.
-               dest = "place_id:"+ place.getId();
+               dest = ""+ place.getId();
                 Log.i("Fragment", "Place: " + place.getName() + ", " + place.getId());
             }
 
@@ -189,6 +202,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         polylinePaths = new ArrayList<>();
         originMarkers = new ArrayList<>();
         destinationMarkers = new ArrayList<>();
+        Random rnd = new Random();
+        this.routes = routes;
 
         for (Route route : routes) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(route.startLocation, 16));
@@ -203,10 +218,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
                     .title(route.endAddress)
                     .position(route.endLocation)));
+//
+//            float sum = 0;
+//            for(int i: route.aqi) {
+//                sum = sum + i;
+//            }
+//            int avg = Math.round(sum / route.aqi.size());
+//
+//            int color;
+//
+//            switch(avg){
+//                case 0:
+//                    color = Color.GREEN;
+//                    break;
+//                case 1:
+//                    color = Color.YELLOW;
+//                    break;
+//                case 2:
+//                    color = getResources().getColor(R.color.orange);
+//                    break;
+//                case 3:
+//                    color = Color.RED;
+//                    break;
+//                case 4:
+//                    color = getResources().getColor(R.color.purple);
+//                    break;
+//                case 5:
+//                    color = getResources().getColor(R.color.maroon);
+//                    break;
+//                default:
+//                    color = Color.GRAY;
+//                    break;
+//            }
+
 
             PolylineOptions polylineOptions = new PolylineOptions().
-                    geodesic(true).
-                    color(Color.BLUE).
+                    geodesic(true).color(Color.argb(255,rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256))).
                     width(10);
 
             for (int i = 0; i < route.points.size(); i++)
@@ -227,4 +274,60 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         BottomSheetFragment bottomSheetFragment = new BottomSheetFragment();
         bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
     }
+
+    //custom ArrayAdapter
+//    class CustomArrayAdapter extends ArrayAdapter<Route> {
+//
+//        private Context context;
+//        private List<Route> route;
+//
+//        //constructor, call on creation
+//        public CustomArrayAdapter(Context context, int resource, ArrayList<Route> objects) {
+//            super(context, resource, objects);
+//
+//            this.context = context;
+//            this.route = objects;
+//        }
+//
+//        //called when rendering the list
+//        public View getView(int position, View convertView, ViewGroup parent) {
+//
+//            //get the property we are displaying
+//            Property property = rentalProperties.get(position);
+//
+//            //get the inflater and inflate the XML layout for each item
+//            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+//            View view = inflater.inflate(R.layout.property_layout, null);
+//
+//            TextView description = (TextView) view.findViewById(R.id.description);
+//            TextView address = (TextView) view.findViewById(R.id.address);
+//            ImageView image = (ImageView) view.findViewById(R.id.image);
+//
+//            //set address and description
+//            String completeAddress = property.getStreetNumber() + " " + property.getStreetName() + ", " + property.getSuburb() + ", " + property.getState();
+//            address.setText(completeAddress);
+//
+//            //display trimmed excerpt for description
+//            int descriptionLength = property.getDescription().length();
+//            if(descriptionLength >= 100){
+//                String descriptionTrim = property.getDescription().substring(0, 100) + "...";
+//                description.setText(descriptionTrim);
+//            }else{
+//                description.setText(property.getDescription());
+//            }
+//
+//            //set price and rental attributes
+//            price.setText("$" + String.valueOf(property.getPrice()));
+//            bedroom.setText("Bed: " + String.valueOf(property.getBedrooms()));
+//            bathroom.setText("Bath: " + String.valueOf(property.getBathrooms()));
+//            carspot.setText("Car: " + String.valueOf(property.getCarspots()));
+//
+//            //get the image associated with this property
+//            int imageID = context.getResources().getIdentifier(property.getImage(), "drawable", context.getPackageName());
+//            image.setImageResource(imageID);
+//
+//            return view;
+//        }
+//    }
 }
+

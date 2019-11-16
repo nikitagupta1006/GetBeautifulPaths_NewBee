@@ -33,5 +33,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         View view = inflater.inflate(R.layout.fragment_bottom_sheet_dialog, container, false);
         LinearLayout linearLayout = (LinearLayout) view.findViewById(R.id.linear_layout_fragment_bottom_sheet);
         int numberOfRoutes = 5;
+        return view;
     }
 }
