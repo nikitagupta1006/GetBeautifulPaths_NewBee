@@ -54,6 +54,7 @@
                     android:layout_width="wrap_content"
                     android:orientation="horizontal"
                     android:layout_height="wrap_content">
+
                     <ImageView
                         android:layout_width="40dp"
                         android:layout_height="20dp"
@@ -66,6 +67,21 @@
                         android:textColor="@color/quantum_bluegrey500"
                         android:id="@+id/distance"
                         android:text="12KM"/>
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="20dp"
+                        android:id="@+id/aqi_marker"
+                        android:maxHeight="2dp"
+                        android:src="@drawable/baseline_favorite_black_18dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/quantum_bluegrey500"
+                        android:id="@+id/aqiLevel"
+                        android:text="12KM"/>
+
+
                 </LinearLayout>
             </LinearLayout>
             <de.hdodenhof.circleimageview.CircleImageView

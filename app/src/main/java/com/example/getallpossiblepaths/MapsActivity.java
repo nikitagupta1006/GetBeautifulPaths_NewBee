@@ -66,6 +66,8 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.w3c.dom.Text;
+
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, DirectionFinderListener {
@@ -269,42 +271,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .icon(BitmapDescriptorFactory.fromResource(R.drawable.end_green))
                     .title(route.endAddress)
                     .position(route.endLocation)));
-//
-//            float sum = 0;
-//            for(int i: route.aqi) {
-//                sum = sum + i;
-//            }
-//            int avg = Math.round(sum / route.aqi.size());
-//
-//            int color;
-//
-//            switch(avg){
-//                case 0:
-//                    color = Color.GREEN;
-//                    break;
-//                case 1:
-//                    color = Color.YELLOW;
-//                    break;
-//                case 2:
-//                    color = getResources().getColor(R.color.orange);
-//                    break;
-//                case 3:
-//                    color = Color.RED;
-//                    break;
-//                case 4:
-//                    color = getResources().getColor(R.color.purple);
-//                    break;
-//                case 5:
-//                    color = getResources().getColor(R.color.maroon);
-//                    break;
-//                default:
-//                    color = Color.GRAY;
-//                    break;
-//            }
+
+            float sum = 0;
+            for(int i: route.aqi) {
+                sum = sum + i;
+            }
+            int avg = Math.round(sum / route.aqi.size());
+
+            int color;
+
+            switch(avg){
+                case 0:
+                    color = Color.GREEN;
+                    break;
+                case 1:
+                    color = Color.YELLOW;
+                    break;
+                case 2:
+                    color = getResources().getColor(R.color.orange);
+                    break;
+                case 3:
+                    color = Color.RED;
+                    break;
+                case 4:
+                    color = getResources().getColor(R.color.purple);
+                    break;
+                case 5:
+                    color = getResources().getColor(R.color.maroon);
+                    break;
+                default:
+                    color = Color.GRAY;
+                    break;
+            }
 
 
             PolylineOptions polylineOptions = new PolylineOptions().
-                    geodesic(true).color(Color.argb(255,rnd.nextInt(256),rnd.nextInt(256),rnd.nextInt(256))).
+                    geodesic(true).color(color).
                     width(10);
 
             for (int i = 0; i < route.points.size(); i++)
@@ -353,6 +355,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             TextView display_time = (TextView) view.findViewById(R.id.display_time);
             TextView eta = (TextView) view.findViewById(R.id.eta);
             TextView distance = (TextView) view.findViewById(R.id.distance);
+            TextView aqi = (TextView) view.findViewById(R.id.aqiLevel);
             CircleImageView aqi_image = (CircleImageView) view.findViewById(R.id.aqi_image);
 
             float sum = 0;
@@ -360,27 +363,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 sum = sum + i;
             }
             int avg = Math.round(sum / property.aqi.size());
-
+            String text = "";
             int color;
 
             switch(avg){
                 case 0:
                     color = Color.GREEN;
+                    text = "Good";
                     break;
                 case 1:
                     color = Color.YELLOW;
+                    text = "Satisfactory";
                     break;
                 case 2:
                     color = getContext().getResources().getColor(R.color.orange);
+                    text = "Moderately Polluted";
                     break;
                 case 3:
                     color = Color.RED;
+                    text = "Poor";
                     break;
                 case 4:
                     color = getContext().getResources().getColor(R.color.purple);
+                    text = "Very Poor";
                     break;
                 case 5:
                     color = getContext().getResources().getColor(R.color.maroon);
+                    text = "Severe";
                     break;
                 default:
                     color = Color.GRAY;
@@ -388,6 +397,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
 
             aqi_image.setCircleBackgroundColor(color);
+            aqi.setText(String.valueOf(text));
 
 
             distance.setText(String.valueOf(property.distance.text));
