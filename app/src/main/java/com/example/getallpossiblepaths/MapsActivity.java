@@ -80,6 +80,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ProgressDialog progressDialog;
     private String origin = "";
     private String dest = "";
+    private int mMode = 0;
     private List<Route> routes;
 
     @Override
@@ -150,6 +151,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        final FloatingActionButton mode0 = (FloatingActionButton) findViewById(R.id.mode0);
+        final FloatingActionButton mode1 = (FloatingActionButton) findViewById(R.id.mode1);
+        final FloatingActionButton mode2 = (FloatingActionButton) findViewById(R.id.mode2);
+
+        mode0.setImageResource(R.drawable.baseline_access_time_black_18dp); // ETA
+        mode1.setImageResource(R.drawable.baseline_height_white_18dp); // Distance
+        mode2.setImageResource(R.drawable.baseline_favorite_white_18dp); // AQI
+
+        mode0.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMode = 0;
+                mode0.setImageResource(R.drawable.baseline_access_time_black_18dp);
+                mode1.setImageResource(R.drawable.baseline_height_white_18dp);
+                mode2.setImageResource(R.drawable.baseline_favorite_white_18dp);
+               // Toast.makeText(MapsActivity.this, "ETA selected", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        mode1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMode = 1;
+                mode0.setImageResource(R.drawable.baseline_access_time_white_18dp);
+                mode1.setImageResource(R.drawable.baseline_height_black_18dp);
+                mode2.setImageResource(R.drawable.baseline_favorite_white_18dp);
+               // Toast.makeText(MapsActivity.this, "Distance selected", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+        mode2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMode = 2;
+                mode0.setImageResource(R.drawable.baseline_access_time_white_18dp);
+                mode1.setImageResource(R.drawable.baseline_height_white_18dp);
+                mode2.setImageResource(R.drawable.baseline_favorite_black_18dp);
+               // Toast.makeText(MapsActivity.this, "AQI selected", Toast.LENGTH_LONG).show();
+
+            }
+        });
+
+
     }
 
     private void sendRequest() {
@@ -165,7 +210,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         try {
-            new DirectionFinder(this, origin, destination).execute();
+            new DirectionFinder(this, origin, destination, mMode).execute(); //mode
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

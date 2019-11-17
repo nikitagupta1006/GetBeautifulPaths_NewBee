@@ -33,11 +33,13 @@ public class DirectionFinder {
     private DirectionFinderListener listener;
     private String origin;
     private String destination;
+    private int mode;
 
-    public DirectionFinder(DirectionFinderListener listener, String origin, String destination) {
+    public DirectionFinder(DirectionFinderListener listener, String origin, String destination, int mode) {
         this.listener = listener;
         this.origin = origin;
         this.destination = destination;
+        this.mode = mode; // mode
     }
 
     public void execute() throws UnsupportedEncodingException {
@@ -58,7 +60,8 @@ public class DirectionFinder {
         protected String doInBackground(String... params) {
             String link = params[0];
             try {
-                String link2 = "http://172.16.77.134:8080/getPaths?source_placeId=" + origin + "&dest_placeId=" + destination + "&time=" + new SimpleDateFormat("HH:mm").format(new Date());
+                String link2 = "http://172.16.77.134:8080/getPaths?source_placeId=" + origin + "&dest_placeId=" + destination + "&time=" +
+                                new SimpleDateFormat("HH:mm").format(new Date()) + "&mode=" + mode; // mode
                 URL url = new URL(link2);
                 HttpURLConnection httpClient = (HttpURLConnection) url.openConnection();
                 httpClient.setRequestMethod("GET");
